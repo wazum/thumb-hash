@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="messages" date="2024-01-01T00:00:00Z" product-name="thumb_hash">
+        <body>
+            <trans-unit id="sys_file_metadata.thumb_hash">
+                <source>Image placeholder (ThumbHash)</source>
+            </trans-unit>
+            <trans-unit id="sys_file_metadata.thumb_hash.description">
+                <source>Automatically generated compact placeholder that shows a blurred preview while the image loads. This improves perceived loading speed and prevents layout shifts.</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

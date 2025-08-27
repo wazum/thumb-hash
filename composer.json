@@ -1,0 +1,57 @@
+{
+  "name": "wazum/thumb-hash",
+  "type": "typo3-cms-extension",
+  "description": "TYPO3 extension for generating ThumbHash for images",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": "^8.2",
+    "ext-gd": "*",
+    "typo3/cms-core": "^12.4 || ^13.0",
+    "srwiez/thumbhash": "^1.4"
+  },
+  "suggest": {
+    "ext-imagick": "Recommended for better alpha channel precision. ImageMagick provides more accurate alpha transparency handling than GD."
+  },
+  "autoload": {
+    "psr-4": {
+      "Wazum\\ThumbHash\\": "Classes/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Wazum\\ThumbHash\\Tests\\": "Tests/"
+    }
+  },
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "thumb_hash"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "typo3/cms-composer-installers": true,
+      "typo3/class-alias-loader": true
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.5",
+    "squizlabs/php_codesniffer": "^3.13",
+    "vimeo/psalm": "^6.13",
+    "friendsofphp/php-cs-fixer": "^3.86"
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit",
+    "test:coverage": "vendor/bin/phpunit --coverage-html coverage/",
+    "cs": "vendor/bin/phpcs",
+    "cs:fix": "vendor/bin/phpcbf",
+    "format": "vendor/bin/php-cs-fixer fix",
+    "format:check": "vendor/bin/php-cs-fixer fix --dry-run --diff",
+    "psalm": "vendor/bin/psalm",
+    "psalm:ci": "vendor/bin/psalm --no-cache --show-info=false",
+    "check": [
+      "@cs",
+      "@psalm",
+      "@test"
+    ]
+  }
+}

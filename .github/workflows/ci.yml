@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - '8.2'
+          - '8.3'
+        typo3-version:
+          - '^12.4'
+          - '^13.0'
+    
+    name: PHP ${{ matrix.php-version }} - TYPO3 ${{ matrix.typo3-version }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: gd, imagick, mbstring, intl
+          coverage: none
+      
+      - name: Validate composer.json
+        run: composer validate --no-check-publish --no-check-lock
+      
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ matrix.php-version }}-${{ matrix.typo3-version }}-${{ hashFiles('**/composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-${{ matrix.php-version }}-${{ matrix.typo3-version }}-
+            ${{ runner.os }}-composer-${{ matrix.php-version }}-
+            ${{ runner.os }}-composer-
+      
+      - name: Install dependencies
+        run: |
+          rm -f composer.lock
+          composer require typo3/cms-core=${{ matrix.typo3-version }} --dev --no-update
+          composer update --no-progress --prefer-dist --optimize-autoloader
+      
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit --testdox
+
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - '8.2'
+          - '8.3'
+    
+    name: Code Quality - PHP ${{ matrix.php-version }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: gd, imagick, mbstring, intl
+          coverage: none
+      
+      - name: Install dependencies
+        run: |
+          rm -f composer.lock
+          composer update --prefer-dist --no-interaction --no-progress
+      
+      - name: Run PHP-CS-Fixer
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+      
+      - name: Run Psalm
+        run: vendor/bin/psalm --no-cache --php-version=${{ matrix.php-version }}
+      
+      - name: Run PHP_CodeSniffer
+        run: vendor/bin/phpcs

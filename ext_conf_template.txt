@@ -1,0 +1,8 @@
+# cat=basic/enable/10; type=boolean; label=Auto-generate ThumbHash on file upload
+autoGenerate = 1
+
+# cat=basic/enable/20; type=string; label=Excluded folders for original files only (comma-separated). Note: Processed file variants are always handled regardless of exclusions.
+excludedFolders = fileadmin/_processed_/,fileadmin/_temp_/
+
+# cat=basic/enable/30; type=string; label=Allowed MIME types (comma-separated)
+allowedMimeTypes = image/jpeg,image/png,image/gif

@@ -1,0 +1,31 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Wazum\ThumbHash\:
+    resource: '../Classes/*'
+
+  Wazum\ThumbHash\Service\ThumbHashGenerator:
+    arguments:
+      $processorFactory: '@Wazum\ThumbHash\Image\ImageProcessorFactory'
+
+  Wazum\ThumbHash\EventListener\FileProcessingEventListener:
+    tags:
+      - name: event.listener
+        identifier: 'thumb-hash-file-added'
+        event: TYPO3\CMS\Core\Resource\Event\AfterFileAddedEvent
+        method: handleFileAdded
+      - name: event.listener
+        identifier: 'thumb-hash-file-replaced'
+        event: TYPO3\CMS\Core\Resource\Event\AfterFileReplacedEvent
+        method: handleFileReplaced
+      - name: event.listener
+        identifier: 'thumb-hash-file-contents-set'
+        event: TYPO3\CMS\Core\Resource\Event\AfterFileContentsSetEvent
+        method: handleFileContentsSet
+      - name: event.listener
+        identifier: 'thumb-hash-file-processed'
+        event: TYPO3\CMS\Core\Resource\Event\AfterFileProcessingEvent
+        method: handleFileProcessing

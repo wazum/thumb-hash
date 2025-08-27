@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<ruleset name="TYPO3 ThumbHash Extension">
+    <description>PHP_CodeSniffer configuration for TYPO3 ThumbHash extension</description>
+
+    <!-- Paths to check -->
+    <file>Classes</file>
+    <file>Tests</file>
+
+    <!-- Exclude patterns -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/public/*</exclude-pattern>
+    <exclude-pattern>*/.phpunit.cache/*</exclude-pattern>
+
+    <!-- Use PSR-12 as base standard -->
+    <rule ref="PSR12"/>
+
+    <!-- Additional rules for clean code -->
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="120"/>
+            <property name="absoluteLineLimit" value="150"/>
+        </properties>
+    </rule>
+    <rule ref="Generic.PHP.ForbiddenFunctions">
+        <properties>
+            <property name="forbiddenFunctions" type="array">
+                <element key="sizeof" value="count"/>
+                <element key="print" value="echo"/>
+                <element key="is_null" value="use === null"/>
+            </property>
+        </properties>
+    </rule>
+    
+    <!-- Ensure declare(strict_types=1) is used -->
+    <rule ref="Generic.PHP.RequireStrictTypes"/>
+</ruleset>
