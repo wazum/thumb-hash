@@ -29,3 +29,10 @@ services:
         identifier: 'thumb-hash-file-processed'
         event: TYPO3\CMS\Core\Resource\Event\AfterFileProcessingEvent
         method: handleFileProcessing
+
+  Wazum\ThumbHash\Command\GenerateHashesCommand:
+    tags:
+      - name: 'console.command'
+        command: 'thumbhash:generate'
+        description: 'Generate ThumbHash values for files'
+        schedulable: true

@@ -91,7 +91,7 @@ composer require wazum/thumb-hash
 The extension works out of the box with sensible defaults. After installation:
 1. Go to **Admin Tools > Maintenance > Analyze Database Structure** to add the required database fields
 2. New uploads generate ThumbHash values automatically
-3. Existing images generate hashes on first access
+3. Existing images can be processed using the [command line tool](#command-line-tool)
 4. Configuration can be adjusted in the **Admin Tools > Settings > Extension Configuration** section if needed
 
 ## Usage
@@ -124,6 +124,35 @@ This generates the following HTML output:
 ```
 
 The ViewHelper works with `File`, `FileReference`, and `ProcessedFile` objects.
+
+### Command Line Tool
+
+Generate ThumbHash values for existing files that don't have them yet:
+
+```bash
+# Process up to 100 files (default)
+vendor/bin/typo3 thumbhash:generate
+
+# Process a specific number of files
+vendor/bin/typo3 thumbhash:generate --limit=500
+
+# Process all files (use with caution on large installations)
+vendor/bin/typo3 thumbhash:generate --limit=999999
+```
+
+The command:
+- Processes both original files and their processed variants
+- Respects the extension configuration (allowed MIME types, excluded folders)
+- Shows progress for each processed file
+- Skips files that already have hashes
+- Can be run as a **scheduler task** for automatic processing
+
+**Scheduler Configuration:**
+1. Go to **System > Scheduler**
+2. Create a new task of type "Execute console commands"
+3. Select **thumbhash:generate** from the dropdown
+4. Set options (e.g., `--limit=50`)
+5. Configure the schedule (e.g., daily at night)
 
 ### Frontend Implementation
 
