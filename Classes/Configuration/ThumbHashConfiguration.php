@@ -22,7 +22,7 @@ final readonly class ThumbHashConfiguration
 
     public function getAllowedMimeTypes(): array
     {
-        $mimeTypes = $this->configuration['allowedMimeTypes'] ?? 'image/jpeg,image/png,image/gif';
+        $mimeTypes = $this->configuration['allowedMimeTypes'] ?? 'image/jpeg,image/jpg,image/png,image/gif';
 
         return \array_map(trim(...), \explode(',', $mimeTypes));
     }

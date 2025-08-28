@@ -5,4 +5,4 @@ autoGenerate = 1
 excludedFolders = fileadmin/_processed_/,fileadmin/_temp_/
 
 # cat=basic/enable/30; type=string; label=Allowed MIME types (comma-separated)
-allowedMimeTypes = image/jpeg,image/png,image/gif
+allowedMimeTypes = image/jpeg,image/jpg,image/png,image/gif
