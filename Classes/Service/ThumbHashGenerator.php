@@ -11,7 +11,7 @@ use Wazum\ThumbHash\Image\ImageProcessorFactory;
 
 final readonly class ThumbHashGenerator
 {
-    private const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+    private const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
 
     private ImageProcessor $imageProcessor;
 
@@ -36,7 +36,7 @@ final readonly class ThumbHashGenerator
     {
         $size = $file->getSize();
         if ($size > 0 && $size > self::MAX_FILE_SIZE) {
-            throw new \RuntimeException('File too large for placeholder generation (max 50MB)');
+            throw new \RuntimeException('File too large for placeholder generation (max 20MB)');
         }
     }
 
