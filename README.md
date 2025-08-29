@@ -81,6 +81,9 @@ From a 200 KB image → to 28 characters → back to a beautiful placeholder tha
 - **Multiple processors** — Supports both GD and ImageMagick
 - **ViewHelper integration** — Simple Fluid template integration
 - **Event-driven** — Responds to TYPO3 file events automatically
+- **Console command** — Process existing files via CLI with `thumbhash:generate`
+- **Scheduler support** — Run batch processing as scheduled tasks
+- **Minified JavaScript** — Ready-to-use decoder included
 
 ## Installation
 
@@ -199,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         img.style.background = 'url(' + dataUrl + ') center/cover no-repeat';
         img.addEventListener('load', function() {
-            img.style.background = '';
+            img.style.background = '';  // Note: This clears any existing background
         }, { once: true });
     });
 });
@@ -223,7 +226,7 @@ document.querySelectorAll('[data-thumbhash]').forEach(img => {
     
     img.style.background = `url(${dataUrl}) center/cover no-repeat`
     img.addEventListener('load', () => {
-        img.style.background = ''
+        img.style.background = ''  // Note: This clears any existing background
     }, { once: true })
 })
 ```
