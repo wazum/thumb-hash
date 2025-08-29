@@ -158,11 +158,64 @@ The command:
 
 **Note:** ThumbHash uses progressive enhancement — images load normally even with JavaScript disabled. The placeholder effect is a visual enhancement only.
 
+The extension includes a minified ThumbHash decoder at [`Resources/Public/JavaScript/thumb-hash.min.js`](Resources/Public/JavaScript/thumb-hash.min.js) that provides the `thumbHashToDataURL` function.
+
+#### Step 1: Include the JavaScript Library
+
+Add to your TypoScript setup:
+
+```typoscript
+# In your site package or TypoScript template
+page.includeJSFooter {
+    thumbHash = EXT:thumb_hash/Resources/Public/JavaScript/thumb-hash.min.js
+    thumbHash.defer = 1
+}
+```
+
+Or via Fluid in your template:
+
+```html
+<f:asset.script 
+    identifier="thumbhash" 
+    src="EXT:thumb_hash/Resources/Public/JavaScript/thumb-hash.min.js" 
+    defer="1" />
+```
+
+#### Step 2: Initialize ThumbHash Placeholders
+
+Add your initialization code after the library:
+
 ```javascript
-// Optimized import — only what you need (tree-shaken to ~4-5 kB)
+// In your site's JavaScript file or inline script
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[data-thumbhash]').forEach(function(img) {
+        const hash = img.dataset.thumbhash;
+        const hashArray = new Uint8Array(
+            atob(hash).split('').map(function(c) { 
+                return c.charCodeAt(0); 
+            })
+        );
+        const dataUrl = thumbHashToDataURL(hashArray);
+        
+        img.style.background = 'url(' + dataUrl + ') center/cover no-repeat';
+        img.addEventListener('load', function() {
+            img.style.background = '';
+        }, { once: true });
+    });
+});
+```
+
+#### Alternative: Using npm/Build Tools
+
+If you prefer to use npm and a build process with the [thumbhash npm package](https://www.npmjs.com/package/thumbhash):
+
+```bash
+npm install thumbhash
+```
+
+```javascript
 import { thumbHashToDataURL } from 'thumbhash'
 
-// Apply placeholders to all images
 document.querySelectorAll('[data-thumbhash]').forEach(img => {
     const hash = img.dataset.thumbhash
     const hashArray = Uint8Array.from(atob(hash), c => c.charCodeAt(0))
