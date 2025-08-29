@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/wazum/thumb-hash/actions/workflows/ci.yml/badge.svg)](https://github.com/wazum/thumb-hash/actions/workflows/ci.yml)
 [![PHP](https://img.shields.io/badge/PHP-8.2%20|%208.3-blue.svg)](https://www.php.net/)
-[![TYPO3](https://img.shields.io/badge/TYPO3-12.4%20|%2013.0-orange.svg)](https://typo3.org/)
+[![TYPO3](https://img.shields.io/badge/TYPO3-12.4%20|%2013.4-orange.svg)](https://typo3.org/)
 [![License](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](LICENSE)
 
 Generate ultra-compact, beautiful image placeholders for TYPO3 websites. [ThumbHash](https://evanw.github.io/thumbhash/) creates placeholders in **just ~28 bytes** ✨ that accurately represent your images while they load.
@@ -266,7 +266,7 @@ ThumbHash enhances perceived performance:
 
 ## Requirements
 
-- TYPO3 CMS 12.4+ or 13.0+
+- TYPO3 CMS 12.4+ or 13.4+
 - PHP 8.2+
 - GD PHP extension (required - already included in standard TYPO3 installations)
 - ImageMagick PHP extension (optional but recommended for better alpha channel precision)
