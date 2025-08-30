@@ -14,7 +14,6 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Wazum\ThumbHash\Configuration\ThumbHashConfiguration;
 use Wazum\ThumbHash\Service\FileMetadataService;
 use Wazum\ThumbHash\Service\ProcessedFileMetadataService;
@@ -33,6 +32,7 @@ final class GenerateHashesCommand extends Command
         private readonly ThumbHashConfiguration $configuration,
         private readonly ResourceFactory $resourceFactory,
         private readonly ProcessedFileRepository $processedFileRepository,
+        private readonly ConnectionPool $connectionPool,
     ) {
         parent::__construct();
     }
@@ -76,8 +76,7 @@ final class GenerateHashesCommand extends Command
      */
     private function processOriginalFiles(SymfonyStyle $io, int $limit): int
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable('sys_file');
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_file');
 
         $query = $queryBuilder
             ->select('f.uid')
@@ -130,8 +129,7 @@ final class GenerateHashesCommand extends Command
             return 0;
         }
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable('sys_file_processedfile');
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_file_processedfile');
 
         $query = $queryBuilder
             ->select('p.uid', 'p.original')
@@ -143,8 +141,12 @@ final class GenerateHashesCommand extends Command
                 )
             );
 
+        $allowedMimeTypes = $this->configuration->getAllowedMimeTypes();
         $query->andWhere(
-            $queryBuilder->expr()->like('f.mime_type', $queryBuilder->createNamedParameter('image/%'))
+            $queryBuilder->expr()->in(
+                'f.mime_type',
+                $queryBuilder->createNamedParameter($allowedMimeTypes, Connection::PARAM_STR_ARRAY)
+            )
         );
 
         $query->setMaxResults($limit);
