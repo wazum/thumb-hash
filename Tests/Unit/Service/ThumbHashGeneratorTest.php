@@ -6,16 +6,29 @@ namespace Wazum\ThumbHash\Tests\Unit\Service;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Resource\FileInterface;
+use Wazum\ThumbHash\Configuration\ThumbHashConfiguration;
 use Wazum\ThumbHash\Image\ImageProcessorFactory;
 use Wazum\ThumbHash\Service\ThumbHashGenerator;
 
 final class ThumbHashGeneratorTest extends TestCase
 {
+    private function createFactoryUsingGd(): ImageProcessorFactory
+    {
+        $extConf = $this->createMock(ExtensionConfiguration::class);
+        $extConf->method('get')->willReturn([
+            'imageProcessor' => 'gd',
+        ]);
+        $config = new ThumbHashConfiguration($extConf);
+
+        return new ImageProcessorFactory($config);
+    }
+
     #[Test]
     public function generatesHashFromValidFile(): void
     {
-        $factory = new ImageProcessorFactory();
+        $factory = $this->createFactoryUsingGd();
         $generator = new ThumbHashGenerator($factory);
 
         $file = $this->createMock(FileInterface::class);
@@ -26,14 +39,13 @@ final class ThumbHashGeneratorTest extends TestCase
 
         $this->assertNotNull($hash);
         $this->assertIsString($hash);
-        // Known hash for lightning-strikes.jpg
         $this->assertSame('E/cNFYJWaHeMh3eAeHh3eWaAWFMJ', $hash);
     }
 
     #[Test]
     public function returnsNullForEmptyFileContent(): void
     {
-        $factory = new ImageProcessorFactory();
+        $factory = $this->createFactoryUsingGd();
         $generator = new ThumbHashGenerator($factory);
 
         $file = $this->createMock(FileInterface::class);
@@ -47,7 +59,7 @@ final class ThumbHashGeneratorTest extends TestCase
     #[Test]
     public function returnsNullWhenFileThrowsException(): void
     {
-        $factory = new ImageProcessorFactory();
+        $factory = $this->createFactoryUsingGd();
         $generator = new ThumbHashGenerator($factory);
 
         $file = $this->createMock(FileInterface::class);
@@ -61,7 +73,7 @@ final class ThumbHashGeneratorTest extends TestCase
     #[Test]
     public function returnsNullForInvalidImageContent(): void
     {
-        $factory = new ImageProcessorFactory();
+        $factory = $this->createFactoryUsingGd();
         $generator = new ThumbHashGenerator($factory);
 
         $file = $this->createMock(FileInterface::class);

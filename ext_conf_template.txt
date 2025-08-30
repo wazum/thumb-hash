@@ -6,3 +6,6 @@ excludedFolders = fileadmin/_processed_/,fileadmin/_temp_/
 
 # cat=basic/enable/30; type=string; label=Allowed MIME types (comma-separated)
 allowedMimeTypes = image/jpeg,image/jpg,image/png,image/gif
+
+# cat=advanced/enable/40; type=string; label=Image processor selection (auto|imagick|gd)
+imageProcessor = auto

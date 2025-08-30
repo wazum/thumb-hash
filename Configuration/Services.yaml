@@ -7,10 +7,6 @@ services:
   Wazum\ThumbHash\:
     resource: '../Classes/*'
 
-  Wazum\ThumbHash\Service\ThumbHashGenerator:
-    arguments:
-      $processorFactory: '@Wazum\ThumbHash\Image\ImageProcessorFactory'
-
   Wazum\ThumbHash\EventListener\FileProcessingEventListener:
     tags:
       - name: event.listener

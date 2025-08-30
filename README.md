@@ -236,9 +236,14 @@ document.querySelectorAll('[data-thumbhash]').forEach(img => {
 Extension configuration allows you to customize:
 
 - **autoGenerate** — Enable/disable automatic generation (default: true)
-- **allowedMimeTypes** — Supported MIME types (default: image/jpeg,image/png,image/gif)
+- **allowedMimeTypes** — Supported MIME types (default: image/jpeg,image/jpg,image/png,image/gif)
 - **excludedFolders** — Folders to skip for original files only (default: fileadmin/_processed_/,fileadmin/_temp_/)
   - Note: Processed file variants are always handled regardless of folder exclusions, ensuring cropped/resized images get their own accurate placeholders
+- **imageProcessor** — Select processing backend: `auto` | `imagick` | `gd`
+  - `auto` tries `imagick` → `gd`
+  - Explicit choices have no fallback. Ensure the dependency exists (e.g., PHP Imagick extension for `imagick`).
+  - Set via Install Tool: Admin Tools → Settings → Extension Configuration → `thumb_hash`
+    or in configuration: `$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['thumb_hash']['imageProcessor'] = 'gd';`
 
 ## Architecture
 
@@ -252,9 +257,14 @@ Extension configuration allows you to customize:
 - `AfterFileReplacedEvent` — Regenerate when files change (respects folder exclusions)
 
 ### Image Processing
-The extension automatically selects the best available processor:
-1. **ImageMagick** (preferred when available) — Superior alpha channel precision
-2. **GD** (required fallback) — Universal availability, part of TYPO3's core requirements
+Processor selection respects the `imageProcessor` setting. With `auto`, priority is:
+1. **Imagick (PHP extension)** — High quality, good alpha handling
+2. **GD** — Ubiquitous fallback
+
+Why no CLI (GraphicalFunctions) support?
+- External process overhead is large (hundreds of ms/iter), dominated by process spawn and TXT I/O.
+- Placeholder generation downsamples to ≤100px; color/alpha precision gains from CLI paths are negligible compared to GD/Imagick.
+- Benchmarks showed GD/Imagick are orders of magnitude faster with indistinguishable results at this size.
 
 ## User Experience Benefits
 
@@ -268,11 +278,12 @@ ThumbHash enhances perceived performance:
 
 - TYPO3 CMS 12.4+ or 13.4+
 - PHP 8.2+
-- GD PHP extension (required - already included in standard TYPO3 installations)
-- ImageMagick PHP extension (optional but recommended for better alpha channel precision)
-- srwiez/thumbhash ^1.4
+- GD PHP extension (required; fallback processor and part of standard TYPO3 installs)
+- Imagick PHP extension (optional but recommended), otherwise GD is used
+- Composer dependency: `srwiez/thumbhash ^1.4`
 
-**Note:** While the extension supports both GD and ImageMagick for image processing (preferring ImageMagick when available), GD is currently a hard requirement in composer.json as it serves as the fallback processor and is already required by TYPO3 itself.
+Notes:
+- You can choose the processor via `imageProcessor` (auto|imagick|gd). Explicit choices have no fallback.
 
 ## License
 

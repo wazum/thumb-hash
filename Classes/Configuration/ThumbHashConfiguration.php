@@ -33,4 +33,16 @@ final readonly class ThumbHashConfiguration
 
         return \array_map(trim(...), \explode(',', $folders));
     }
+
+    public function getImageProcessor(): string
+    {
+        $raw = (string) ($this->configuration['imageProcessor'] ?? 'auto');
+        $processor = \strtolower(\trim($raw));
+
+        return match ($processor) {
+            'imagick' => 'imagick',
+            'gd' => 'gd',
+            default => 'auto',
+        };
+    }
 }

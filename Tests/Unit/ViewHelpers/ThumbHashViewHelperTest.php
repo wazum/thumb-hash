@@ -7,6 +7,7 @@ namespace Wazum\ThumbHash\Tests\Unit\ViewHelpers;
 use Doctrine\DBAL\Result;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder;
@@ -14,6 +15,8 @@ use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileReference;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
+use Wazum\ThumbHash\Configuration\ThumbHashConfiguration;
+use Wazum\ThumbHash\Image\ImageProcessorFactory;
 use Wazum\ThumbHash\Service\FileMetadataService;
 use Wazum\ThumbHash\Service\ProcessedFileMetadataService;
 use Wazum\ThumbHash\Service\ThumbHashGenerator;
@@ -29,8 +32,12 @@ final class ThumbHashViewHelperTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
-        // Create generator with factory
-        $processorFactory = new \Wazum\ThumbHash\Image\ImageProcessorFactory();
+        $extensionConfiguration = $this->createMock(ExtensionConfiguration::class);
+        $extensionConfiguration->method('get')->willReturn([
+            'imageProcessor' => 'gd',
+        ]);
+        $configuration = new ThumbHashConfiguration($extensionConfiguration);
+        $processorFactory = new ImageProcessorFactory($configuration);
         $this->generator = new ThumbHashGenerator($processorFactory);
 
         // Create a real metadata service with mocked DB connection

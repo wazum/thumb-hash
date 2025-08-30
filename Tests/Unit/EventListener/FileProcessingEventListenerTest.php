@@ -6,6 +6,7 @@ namespace Wazum\ThumbHash\Tests\Unit\EventListener;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Resource\Driver\DriverInterface;
@@ -37,18 +38,19 @@ final class FileProcessingEventListenerTest extends TestCase
         $connectionPool = $this->createMock(ConnectionPool::class);
         $connectionPool->method('getConnectionForTable')->willReturn($this->connection);
 
-        $extensionConfiguration = $this->createMock(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class);
+        $extensionConfiguration = $this->createMock(ExtensionConfiguration::class);
         $extensionConfiguration->method('get')->willReturn([
             'autoGenerate' => true,
             'allowedMimeTypes' => 'image/jpeg,image/png,image/gif',
             'excludedFolders' => '/_temp_/',
+            'imageProcessor' => 'gd',
         ]);
 
         // Use real instances of our own classes
         $configuration = new ThumbHashConfiguration($extensionConfiguration);
         $fileMetadataService = new FileMetadataService($connectionPool);
         $processedFileMetadataService = new ProcessedFileMetadataService($connectionPool);
-        $imageProcessorFactory = new ImageProcessorFactory();
+        $imageProcessorFactory = new ImageProcessorFactory($configuration);
         $generator = new ThumbHashGenerator($imageProcessorFactory);
 
         $this->listener = new FileProcessingEventListener(
@@ -217,11 +219,12 @@ final class FileProcessingEventListenerTest extends TestCase
     public function skipsFileWhenAutoGenerationDisabled(): void
     {
         // Create a new listener with auto-generation disabled
-        $extensionConfiguration = $this->createMock(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class);
+        $extensionConfiguration = $this->createMock(ExtensionConfiguration::class);
         $extensionConfiguration->method('get')->willReturn([
             'autoGenerate' => false,
             'allowedMimeTypes' => 'image/jpeg,image/png,image/gif',
             'excludedFolders' => '/_temp_/',
+            'imageProcessor' => 'gd',
         ]);
 
         $connectionPool = $this->createMock(ConnectionPool::class);
@@ -230,7 +233,7 @@ final class FileProcessingEventListenerTest extends TestCase
         $configuration = new ThumbHashConfiguration($extensionConfiguration);
         $fileMetadataService = new FileMetadataService($connectionPool);
         $processedFileMetadataService = new ProcessedFileMetadataService($connectionPool);
-        $imageProcessorFactory = new ImageProcessorFactory();
+        $imageProcessorFactory = new ImageProcessorFactory($configuration);
         $generator = new ThumbHashGenerator($imageProcessorFactory);
 
         $listener = new FileProcessingEventListener(
