@@ -163,72 +163,42 @@ The command:
 
 The extension includes a minified ThumbHash decoder at [`Resources/Public/JavaScript/thumb-hash.min.js`](Resources/Public/JavaScript/thumb-hash.min.js) that provides the `thumbHashToDataURL` function.
 
-#### Step 1: Include the JavaScript Library
+#### Add to your PAGE setup
 
-Add to your TypoScript setup:
+Add your initialization code after the page (and all the images):
 
 ```typoscript
-# In your site package or TypoScript template
-page.includeJSFooter {
-    thumbHash = EXT:thumb_hash/Resources/Public/JavaScript/thumb-hash.min.js
-    thumbHash.defer = 1
-}
-```
+page {
+    includeJS {
+        thumbHash = EXT:thumb_hash/Resources/Public/JavaScript/thumb-hash.min.js
+        thumbHash.forceOnTop = 1
+    }
 
-Or via Fluid in your template:
+    10 = FLUIDTEMPLATE
+    10 {
+       …
+    }
 
-```html
-<f:asset.script 
-    identifier="thumbhash" 
-    src="EXT:thumb_hash/Resources/Public/JavaScript/thumb-hash.min.js" 
-    defer="1" />
-```
+    20 = TEXT
+    20.value (
+        <script>
 
-#### Step 2: Initialize ThumbHash Placeholders
-
-Add your initialization code after the library:
-
-```javascript
-// In your site's JavaScript file or inline script
-document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('[data-thumbhash]').forEach(function(img) {
-        const hash = img.dataset.thumbhash;
-        const hashArray = new Uint8Array(
-            atob(hash).split('').map(function(c) { 
-                return c.charCodeAt(0); 
-            })
-        );
-        const dataUrl = thumbHashToDataURL(hashArray);
-        
+        var hash = img.dataset.thumbhash;
+        if (!hash) return;
+        var bytes = new Uint8Array(atob(hash).split('').map(function(c) {
+            return c.charCodeAt(0);
+        }));
+        var dataUrl = thumbHashToDataURL(bytes);
         img.style.background = 'url(' + dataUrl + ') center/cover no-repeat';
         img.addEventListener('load', function() {
-            img.style.background = '';  // Note: This clears any existing background
+            img.style.background = '';
         }, { once: true });
     });
-});
-```
 
-#### Alternative: Using npm/Build Tools
-
-If you prefer to use npm and a build process with the [thumbhash npm package](https://www.npmjs.com/package/thumbhash):
-
-```bash
-npm install thumbhash
-```
-
-```javascript
-import { thumbHashToDataURL } from 'thumbhash'
-
-document.querySelectorAll('[data-thumbhash]').forEach(img => {
-    const hash = img.dataset.thumbhash
-    const hashArray = Uint8Array.from(atob(hash), c => c.charCodeAt(0))
-    const dataUrl = thumbHashToDataURL(hashArray)
-    
-    img.style.background = `url(${dataUrl}) center/cover no-repeat`
-    img.addEventListener('load', () => {
-        img.style.background = ''  // Note: This clears any existing background
-    }, { once: true })
-})
+        </script>
+    )
+}
 ```
 
 ## Configuration
