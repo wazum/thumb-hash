@@ -5,7 +5,26 @@
 [![TYPO3](https://img.shields.io/badge/TYPO3-12.4%20|%2013.4-orange.svg)](https://typo3.org/)
 [![License](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](LICENSE)
 
-Generate ultra-compact, beautiful image placeholders for TYPO3 websites. [ThumbHash](https://evanw.github.io/thumbhash/) creates placeholders in **just ~28 bytes** ✨ that accurately represent your images while they load.
+Generate ultra-compact, beautiful image placeholders for TYPO3 websites. [ThumbHash](https://evanw.github.io/thumbhash/) creates placeholders in **just ~28 bytes** ✨ that accurately represent your images while they load. It seamlessly enhances native lazy loading (`loading="lazy"`) by showing a meaningful preview until the image appears.
+
+## Benefits at a Glance
+
+- Show a soft, on‑brand preview while images load — no more empty space.
+- No extra image files, no extra requests — just a few characters embedded alongside your image.
+- Works automatically with your existing TYPO3 images, templates and lazy loading (`loading="lazy"` or JS libraries).
+
+### Perfect For
+- Product listings and category grids (e‑commerce)
+- News teasers and card layouts (publishers)
+- Portfolios, galleries and hero images (agencies/creatives)
+- Landing pages with many visuals (marketing)
+- Any site where images load over slow networks or on mobile
+
+### What Makes It Great
+- **Tiny & Fast:** About 25–35 bytes per image; nothing else to download.
+- **Smooth UX:** Beautiful blurred preview that matches the final image and prevents layout shift.
+- **Automatic:** Generated on upload and for every cropped/processed variant.
+- **Drop‑in:** A single Fluid attribute adds the placeholder to your images.
 
 ## Quick Start
 
@@ -16,12 +35,22 @@ composer require wazum/thumb-hash
 ```xml
 <!-- The 'thumbhash' namespace is globally registered, no import needed -->
 <f:image image="{image}"
+         loading="lazy"
          additionalAttributes="{data-thumbhash: '{thumbhash:thumbHash(file: image)}'}" />
 ```
 
-Output: `<img src="..." data-thumbhash="3OcRJYB4d3h/iIeHeEh3eIhw+j3A" alt="">`
+Output: `<img src="..." loading="lazy" data-thumbhash="3OcRJYB4d3h/iIeHeEh3eIhw+j3A" alt="">`
 
 That's it! Hashes are generated automatically on upload. Add the [frontend JavaScript](#frontend-implementation) for the blur effect.
+
+## Use Cases
+
+- **E‑commerce lists:** Give shoppers instant visual context while product images stream in.
+- **News portals:** Keep article cards readable without jarring pop‑in as thumbnails load.
+- **Portfolios & galleries:** Maintain composition and color feel while high‑res shots load.
+- **Hero banners:** Avoid a blank hero on slow connections; show a pleasant preview immediately.
+- **Long pages with lazy images:** Reduce perceived wait time as users scroll.
+- **Low‑bandwidth audiences:** Improve mobile experience in regions with spotty coverage.
 
 ## Why ThumbHash?
 
@@ -51,6 +80,10 @@ ThumbHash generates tiny placeholders that:
 **↓** *Decoded to placeholder (on the client)* **↓**
 
 ![ThumbHash Placeholder](Documentation/lightning-strikes-thumbhash.png)
+
+What your users will see while the image is loading:
+
+<img src="Documentation/lightning-strikes-thumbhash.png" width="300" height="200"/>
 
 </div>
 
@@ -85,6 +118,16 @@ From a 200 KB image → to 28 characters → back to a beautiful placeholder tha
 - **Scheduler support** — Run batch processing as scheduled tasks
 - **Minified JavaScript** — Ready-to-use decoder included
 
+## FAQ
+
+- **Does this slow down my site?** No. The hash is embedded as a tiny string — there are no extra requests. Images load as usual; users just see a better preview.
+- **What if JavaScript is disabled?** Images still load normally. The JS only paints the blurred background until the image finishes loading.
+- **Does this replace lazy loading?** No. Keep using `loading="lazy"` (or your lazy‑loading library). ThumbHash complements it by filling the visual gap with a matching preview while the image is deferred.
+- **Does this affect SEO or accessibility?** No. Your `alt` text, dimensions and markup remain unchanged; placeholders help prevent layout shifts that can harm Core Web Vitals.
+- **Which image types are supported?** JPEG, PNG, GIF by default; you can adjust allowed MIME types. Works regardless of your output format (e.g., WebP/AVIF delivery).
+- **Will it work with cropped images and variants?** Yes. Every processed variant gets its own accurate placeholder.
+- **Can I turn it off for certain folders?** Yes. Use configuration to exclude folders for original files while still handling processed variants.
+
 ## Installation
 
 ```bash
@@ -105,6 +148,7 @@ The extension globally registers the `thumbhash` namespace, so you can use it im
 
 ```xml
 <f:image image="{image}" 
+         loading="lazy"
          additionalAttributes="{data-thumbhash: '{thumbhash:thumbHash(file: image)}'}" />
 ```
 
@@ -122,6 +166,7 @@ This generates the following HTML output:
 <img src="/fileadmin/images/photo.jpg" 
      width="1200" 
      height="800" 
+     loading="lazy"
      data-thumbhash="3OcRJYB4d3h/iIeHeEh3eIhw+j3A" 
      alt="">
 ```
@@ -159,7 +204,7 @@ The command:
 
 ### Frontend Implementation
 
-**Note:** ThumbHash uses progressive enhancement — images load normally even with JavaScript disabled. The placeholder effect is a visual enhancement only.
+**Note:** ThumbHash uses progressive enhancement — images load normally even with JavaScript disabled. The placeholder effect is a visual enhancement only. It also complements native lazy loading and JS lazy‑loading libraries by providing an instant visual preview while the browser defers the image.
 
 The extension includes a minified ThumbHash decoder at [`Resources/Public/JavaScript/thumb-hash.min.js`](Resources/Public/JavaScript/thumb-hash.min.js) that provides the `thumbHashToDataURL` function.
 
