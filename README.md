@@ -5,7 +5,9 @@
 [![TYPO3](https://img.shields.io/badge/TYPO3-12.4%20|%2013.4-orange.svg)](https://typo3.org/)
 [![License](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](LICENSE)
 
-Generate ultra-compact, beautiful image placeholders for TYPO3 websites. [ThumbHash](https://evanw.github.io/thumbhash/) creates placeholders in **just ~28 bytes** ✨ that accurately represent your images while they load. It seamlessly enhances native lazy loading (`loading="lazy"`) by showing a meaningful preview until the image appears.
+Enhance user experience with fast, ultra-compact, and appealing image placeholders for TYPO3 websites.
+
+[ThumbHash](https://evanw.github.io/thumbhash/) creates placeholders in **just ~28 bytes** ✨ that accurately represent your images while they load. It seamlessly enhances native lazy loading (`loading="lazy"`) by showing a meaningful preview until the image appears.
 
 ## Benefits at a Glance
 

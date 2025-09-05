@@ -1,7 +1,7 @@
 {
   "name": "wazum/thumb-hash",
   "type": "typo3-cms-extension",
-  "description": "TYPO3 extension for generating ThumbHash for images",
+  "description": "TYPO3 extension for generating ThumbHash for images. Enhance user experience with fast image thumbnails.",
   "license": "GPL-2.0-or-later",
   "require": {
     "php": "^8.2",
