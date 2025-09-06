@@ -1,14 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
 $EM_CONF[$_EXTKEY] = [
     'title' => 'ThumbHash',
     'description' => 'Generate ThumbHash for images in TYPO3. Enhance user experience with fast image thumbnails.',
-    'category' => 'fe',
-    'author' => 'Wazum',
-    'author_email' => '',
-    'state' => 'beta',
+    'author' => 'Wolfgang Klinger',
+    'author_email' => 'wolfgang@wazum.com',
+    'state' => 'stable',
     'version' => '1.0.0',
     'constraints' => [
         'depends' => [
