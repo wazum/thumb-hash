@@ -248,6 +248,22 @@ page {
 }
 ```
 
+The code above is the most straight-forward integration example. Of course,
+you can use any other kind of integrating the required JavaScript to your
+project, like:
+
+*  Using a JavaScript/TypeScript module file with the code, and integrating it
+   in your frontend build process (if you use vite, webpack, grunt or the likes).
+*  Placing the code in your main layout Fluid file using the
+   [`<f:asset.script>`](https://docs.typo3.org/permalink/t3viewhelper:typo3-fluid-asset-script)
+   (or `<f:vite.asset>` when using vite integration).
+*  When using EXT:contentblocks, adding that Code with the
+   mentioned ViewHelpers into the specific content block fluid file.
+
+These approaches are recommended if your project uses CSP (Content-Security-Policy)
+to block inline JavaScript execution. You need to use proper prioritization so
+that the code above is executed as one of the first JavaScript events in your code
+
 ## Configuration
 
 Extension configuration allows you to customize:
