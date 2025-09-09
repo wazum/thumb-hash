@@ -7,7 +7,7 @@ $finder = PhpCsFixer\Finder::create()
     ->exclude('.phpunit.cache')
     ->exclude('var')
     ->name('*.php')
-    ->notName('*.blade.php')
+    ->notName('ext_emconf.php')
     ->ignoreDotFiles(true)
     ->ignoreVCS(true);
 

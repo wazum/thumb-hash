@@ -10,6 +10,7 @@
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/public/*</exclude-pattern>
     <exclude-pattern>*/.phpunit.cache/*</exclude-pattern>
+    <exclude-pattern>ext_emconf.php</exclude-pattern>
 
     <!-- Use PSR-12 as base standard -->
     <rule ref="PSR12"/>
