@@ -6,9 +6,28 @@ namespace Wazum\ThumbHash\Image;
 
 final class GdImageProcessor implements ImageProcessor
 {
+    private const MAX_DIMENSION = 5000;
+    private const MAX_TOTAL_PIXELS = 25_000_000;
+
     #[\Override]
     public function extractPixels(string $content): array
     {
+        $imageInfo = @\getimagesizefromstring($content);
+        if ($imageInfo === false) {
+            throw new \RuntimeException('Failed to read image dimensions');
+        }
+
+        [$width, $height] = $imageInfo;
+        $totalPixels = $width * $height;
+
+        if ($width > self::MAX_DIMENSION || $height > self::MAX_DIMENSION) {
+            throw new \RuntimeException(\sprintf('Image dimensions too large: %dx%d (max %d per side)', $width, $height, self::MAX_DIMENSION));
+        }
+
+        if ($totalPixels > self::MAX_TOTAL_PIXELS) {
+            throw new \RuntimeException(\sprintf('Image pixel count too large: %d (max %d)', $totalPixels, self::MAX_TOTAL_PIXELS));
+        }
+
         $image = @\imagecreatefromstring($content);
         if ($image === false) {
             throw new \RuntimeException('Failed to create image from content');
@@ -17,6 +36,9 @@ final class GdImageProcessor implements ImageProcessor
         $width = \imagesx($image);
         $height = \imagesy($image);
 
+        // Resize immediately after loading to reduce memory pressure
+        // Unlike Imagick's setSize() hint, GD must load the full image first,
+        // but we minimize memory usage by resizing before pixel extraction
         [$image, $width, $height] = $this->resizeOnDemand($image, $width, $height);
 
         $totalPixels = $width * $height * 4;

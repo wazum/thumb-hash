@@ -275,8 +275,15 @@ Extension configuration allows you to customize:
 
 ### Image Processing
 Processor selection respects the `imageProcessor` setting. With `auto`, priority is:
-1. **Imagick (PHP extension)** — High quality, good alpha handling
+1. **Imagick (PHP extension)** — High quality, good alpha handling, efficient memory usage
 2. **GD** — Ubiquitous fallback
+
+**Important: Memory Considerations**
+- **Imagick is strongly recommended** for production use, especially with large images
+- GD must load entire images into memory before processing, which can cause memory exhaustion on high-resolution images
+- Imagick uses optimized decoding hints to load images at reduced resolution, significantly reducing memory usage
+- The extension includes safeguards (20MB file size limit, dimension limits for GD), but Imagick handles edge cases more gracefully
+- If using GD with large images, ensure adequate PHP memory_limit (512MB+ recommended)
 
 Why no CLI (GraphicalFunctions) support?
 - External process overhead is large (hundreds of ms/iter), dominated by process spawn and TXT I/O.
@@ -296,11 +303,12 @@ ThumbHash enhances perceived performance:
 - TYPO3 CMS 12.4+ or 13.4+
 - PHP 8.2+
 - GD PHP extension (required; fallback processor and part of standard TYPO3 installs)
-- Imagick PHP extension (optional but recommended), otherwise GD is used
+- **Imagick PHP extension (strongly recommended for production)** — GD can cause memory exhaustion with large images
 - Composer dependency: `srwiez/thumbhash ^1.4`
 
 Notes:
 - You can choose the processor via `imageProcessor` (auto|imagick|gd). Explicit choices have no fallback.
+- When using GD with large images, increase PHP memory_limit to 512MB or higher
 
 ## License
 

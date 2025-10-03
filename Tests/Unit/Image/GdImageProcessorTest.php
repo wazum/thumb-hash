@@ -113,7 +113,7 @@ final class GdImageProcessorTest extends TestCase
         $invalidContent = 'not an image';
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Failed to create image from content');
+        $this->expectExceptionMessage('Failed to read image dimensions');
 
         $this->processor->extractPixels($invalidContent);
     }
