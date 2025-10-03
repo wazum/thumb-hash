@@ -13,16 +13,13 @@
     <exclude-pattern>ext_emconf.php</exclude-pattern>
 
     <!-- Use PSR-12 as base standard -->
-    <rule ref="PSR12"/>
+    <rule ref="PSR12">
+        <!-- Exclude line length warnings -->
+        <exclude name="Generic.Files.LineLength"/>
+    </rule>
 
     <!-- Additional rules for clean code -->
     <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
-    <rule ref="Generic.Files.LineLength">
-        <properties>
-            <property name="lineLimit" value="120"/>
-            <property name="absoluteLineLimit" value="150"/>
-        </properties>
-    </rule>
     <rule ref="Generic.PHP.ForbiddenFunctions">
         <properties>
             <property name="forbiddenFunctions" type="array">
