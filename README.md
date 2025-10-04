@@ -256,7 +256,7 @@ project, like:
    in your frontend build process (if you use vite, webpack, grunt or the likes).
 *  Placing the code in your main layout Fluid file using the
    [`<f:asset.script>`](https://docs.typo3.org/permalink/t3viewhelper:typo3-fluid-asset-script)
-   (or `<f:vite.asset>` when using vite integration).
+   (or `<vite:asset>` when using vite integration).
 *  When using EXT:contentblocks, adding that Code with the
    mentioned ViewHelpers into the specific content block fluid file.
 
