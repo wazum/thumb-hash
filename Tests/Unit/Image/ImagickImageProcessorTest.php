@@ -66,7 +66,8 @@ final class ImagickImageProcessorTest extends TestCase
 
         $pixelIndex = 0;
         foreach ($iterator as $pixelRow) {
-            foreach ($pixelRow as $pixel) {
+            /** @var \ImagickPixel $pixel */
+            foreach ($pixelRow ?? [] as $pixel) {
                 if ($pixelIndex >= 4) {
                     break;
                 }

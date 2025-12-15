@@ -17,9 +17,9 @@ final class ImagickImageProcessor implements ImageProcessor
     #[\Override]
     public function extractPixels(string $content): array
     {
-        $oldMemory = \Imagick::getResourceLimit(\Imagick::RESOURCETYPE_MEMORY);
-        $oldMap = \Imagick::getResourceLimit(\Imagick::RESOURCETYPE_MAP);
-        $oldArea = \Imagick::getResourceLimit(\Imagick::RESOURCETYPE_AREA);
+        $oldMemory = (int) \Imagick::getResourceLimit(\Imagick::RESOURCETYPE_MEMORY);
+        $oldMap = (int) \Imagick::getResourceLimit(\Imagick::RESOURCETYPE_MAP);
+        $oldArea = (int) \Imagick::getResourceLimit(\Imagick::RESOURCETYPE_AREA);
 
         \Imagick::setResourceLimit(\Imagick::RESOURCETYPE_MEMORY, self::RESOURCE_MEMORY_MB * 1024 * 1024);
         \Imagick::setResourceLimit(\Imagick::RESOURCETYPE_MAP, self::RESOURCE_MAP_MB * 1024 * 1024);
@@ -42,16 +42,17 @@ final class ImagickImageProcessor implements ImageProcessor
             $pixels = [];
             $iterator = $image->getPixelIterator();
             foreach ($iterator as $pixelRow) {
-                foreach ($pixelRow as $pixel) {
+                /** @var \ImagickPixel $pixel */
+                foreach ($pixelRow ?? [] as $pixel) {
                     // Get normalized color values (0..1 floats) for consistency across builds
                     $colors = $pixel->getColor(1);
                     // Convert to 0..255 integer range
-                    $pixels[] = (int) \round($colors['r'] * 255);
-                    $pixels[] = (int) \round($colors['g'] * 255);
-                    $pixels[] = (int) \round($colors['b'] * 255);
+                    $pixels[] = (int) \round($colors['r'] * 255.0);
+                    $pixels[] = (int) \round($colors['g'] * 255.0);
+                    $pixels[] = (int) \round($colors['b'] * 255.0);
                     // Imagick alpha: 0=transparent, 1=opaque (same as ThumbHash expects)
                     // Convert directly to 0..255 range (0=transparent, 255=opaque)
-                    $pixels[] = (int) \round($colors['a'] * 255);
+                    $pixels[] = (int) \round($colors['a'] * 255.0);
                 }
                 $iterator->syncIterator();
             }
