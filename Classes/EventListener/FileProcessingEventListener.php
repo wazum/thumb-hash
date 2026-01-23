@@ -59,6 +59,11 @@ final readonly class FileProcessingEventListener
             return;
         }
 
+        // FIX: Skip if hash already exists (avoid expensive regeneration on every request)
+        if ($this->processedFileMetadataService->getHash($processedFile) !== null) {
+            return;
+        }
+
         // Generate and store hash for processed file
         $hash = $this->generator->generateFromFile($processedFile);
         if ($hash !== null) {
