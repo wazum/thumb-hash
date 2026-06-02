@@ -134,6 +134,7 @@ final class FileProcessingEventListenerTest extends TestCase
     {
         $processedFile = $this->createMock(ProcessedFile::class);
         $processedFile->method('isImage')->willReturn(true);
+        $processedFile->method('isUpdated')->willReturn(true);
         $processedFile->method('getContents')->willReturn(
             \file_get_contents(__DIR__ . '/../../Fixtures/lightning-strikes.jpg')
         );

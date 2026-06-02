@@ -59,7 +59,13 @@ final readonly class FileProcessingEventListener
             return;
         }
 
-        // Generate and store hash for processed file
+        // The event also fires for cache hits. Skip the expensive read and
+        // hash computation for an already-hashed variant, but still (re)generate
+        // when it was just processed or has no hash yet.
+        if (!$processedFile->isUpdated() && $this->processedFileMetadataService->getHash($processedFile) !== null) {
+            return;
+        }
+
         $hash = $this->generator->generateFromFile($processedFile);
         if ($hash !== null) {
             $this->processedFileMetadataService->storeHash($processedFile, $hash);
