@@ -1,8 +1,8 @@
 # TYPO3 _ThumbHash_ Extension
 
 [![CI](https://github.com/wazum/thumb-hash/actions/workflows/ci.yml/badge.svg)](https://github.com/wazum/thumb-hash/actions/workflows/ci.yml)
-[![PHP](https://img.shields.io/badge/PHP-8.2%20|%208.3-blue.svg)](https://www.php.net/)
-[![TYPO3](https://img.shields.io/badge/TYPO3-12.4%20|%2013.4-orange.svg)](https://typo3.org/)
+[![PHP](https://img.shields.io/badge/PHP-8.2%20|%208.3%20|%208.4-blue.svg)](https://www.php.net/)
+[![TYPO3](https://img.shields.io/badge/TYPO3-12.4%20|%2013.4%20|%2014.3-orange.svg)](https://typo3.org/)
 [![License](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](LICENSE)
 
 Enhance user experience with fast, ultra-compact, and appealing image placeholders for TYPO3 websites.
@@ -350,7 +350,7 @@ ThumbHash enhances perceived performance:
 
 ## Requirements
 
-- TYPO3 CMS 12.4+ or 13.4+
+- TYPO3 CMS 12.4+, 13.4+ or 14.3+
 - PHP 8.2+
 - GD PHP extension (required; fallback processor and part of standard TYPO3 installs)
 - **Imagick PHP extension (strongly recommended for production)** — GD can cause memory exhaustion with large images

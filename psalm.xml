@@ -12,6 +12,9 @@
     <projectFiles>
         <directory name="Classes"/>
         <directory name="Tests"/>
+        <ignoreFiles>
+            <directory name="Tests/Functional"/>
+        </ignoreFiles>
     </projectFiles>
 
     <issueHandlers>

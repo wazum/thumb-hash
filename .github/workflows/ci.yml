@@ -2,94 +2,137 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - 'feature/**'
+      - 'fix/**'
   pull_request:
-    branches: [ main ]
 
 jobs:
-  test:
+  unit:
+    name: Unit - PHP ${{ matrix.php-version }} / TYPO3 ${{ matrix.typo3-version }}
     runs-on: ubuntu-latest
-    
     strategy:
       fail-fast: false
       matrix:
-        php-version:
-          - '8.2'
-          - '8.3'
-        typo3-version:
-          - '^12.4'
-          - '^13.0'
-    
-    name: PHP ${{ matrix.php-version }} - TYPO3 ${{ matrix.typo3-version }}
-    
+        php-version: ['8.2', '8.3', '8.4']
+        typo3-version: ['^12.4', '^13.4', '^14.3']
+        exclude:
+          # TYPO3 12.4 does not support PHP 8.4
+          - { php-version: '8.4', typo3-version: '^12.4' }
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
           extensions: gd, imagick, mbstring, intl
+          tools: composer:v2
           coverage: none
-      
-      - name: Validate composer.json
-        run: composer validate --no-check-publish --no-check-lock
-      
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ matrix.php-version }}-${{ matrix.typo3-version }}-${{ hashFiles('**/composer.json') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-${{ matrix.php-version }}-${{ matrix.typo3-version }}-
-            ${{ runner.os }}-composer-${{ matrix.php-version }}-
-            ${{ runner.os }}-composer-
-      
+
+      # typo3/testing-framework ^9 requires TYPO3 13.4+/14 and is a dev-only
+      # dependency. It must be dropped so dependencies resolve on 12.4.
+      - name: Drop testing-framework for TYPO3 12.4
+        if: matrix.typo3-version == '^12.4'
+        run: composer remove --dev typo3/testing-framework --no-update
+
       - name: Install dependencies
         run: |
-          rm -f composer.lock
-          composer require typo3/cms-core=${{ matrix.typo3-version }} --dev --no-update
+          composer require --no-update typo3/cms-core:"${{ matrix.typo3-version }}"
           composer update --no-progress --prefer-dist --optimize-autoloader
-      
-      - name: Run PHPUnit tests
-        run: vendor/bin/phpunit --testdox
+
+      - name: Run unit tests
+        run: vendor/bin/phpunit -c phpunit.xml --testdox
+
+  functional:
+    name: Functional - PHP ${{ matrix.php-version }} / TYPO3 ${{ matrix.typo3-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.2', '8.3', '8.4']
+        # Functional tests need typo3/testing-framework ^9 (PHPUnit 11),
+        # which supports TYPO3 13.4 and 14 only.
+        typo3-version: ['^13.4', '^14.3']
+    steps:
+      - uses: actions/checkout@v4
+
+      # TYPO3 image processing (CropScaleMask) shells out to the ImageMagick /
+      # GraphicsMagick binaries, so they must be present for process() to work.
+      - name: Install image binaries
+        run: sudo apt-get update && sudo apt-get install -y imagemagick graphicsmagick
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: gd, imagick, mbstring, intl, pdo_sqlite
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer require --no-update typo3/cms-core:"${{ matrix.typo3-version }}"
+          composer update --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Run functional tests
+        env:
+          typo3DatabaseDriver: pdo_sqlite
+        run: vendor/bin/phpunit -c phpunit-functional.xml --testdox
+
+  static-analysis:
+    name: Psalm - TYPO3 ${{ matrix.typo3-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Psalm runs on the modern cores only. On 12.4 it reports version
+        # artifacts (Extbase-coupled ProcessedFileRepository, looser findByUid
+        # return type, older Fluid) that are not bugs and would only be
+        # silenceable by globally weakening analysis. 12.4 keeps unit + install.
+        typo3-version: ['^13.4', '^14.3']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd, imagick, mbstring, intl
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer require --no-update typo3/cms-core:"${{ matrix.typo3-version }}"
+          composer update --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Run Psalm
+        run: vendor/bin/psalm --no-cache --show-info=false
 
   code-quality:
+    name: Code Quality
     runs-on: ubuntu-latest
-    
-    strategy:
-      fail-fast: false
-      matrix:
-        php-version:
-          - '8.2'
-          - '8.3'
-    
-    name: Code Quality - PHP ${{ matrix.php-version }}
-    
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: '8.3'
           extensions: gd, imagick, mbstring, intl
+          tools: composer:v2
           coverage: none
-      
+
+      - name: Validate composer.json
+        run: composer validate --no-check-publish --no-check-lock
+
       - name: Install dependencies
-        run: |
-          rm -f composer.lock
-          composer update --prefer-dist --no-interaction --no-progress
-      
+        run: composer update --no-progress --prefer-dist
+
       - name: Run PHP-CS-Fixer
         run: vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
-      
-      - name: Run Psalm
-        run: vendor/bin/psalm --no-cache --php-version=${{ matrix.php-version }}
-      
+
       - name: Run PHP_CodeSniffer
         run: vendor/bin/phpcs
